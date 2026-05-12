@@ -40,12 +40,14 @@ public class Estado {
 		// 1 calcular la cantidad que debe producir el estado segun el incremento (puede
 //		// ser una cantidad menor)
 //		double objetivoProduccion = calcularCantidadAProducir(porcentajeIncrementoProduccion);
-		totalDemandado *= 1 + porcentajeIncrementoDemanda;
+		double objetivoProduccion = calcularCantidadAProducir(porcentajeIncrementoDemanda);
 //		// 2 Contratar o despedir a adultos segun sea la necesidad
 //		gestionarEmpleos(objetivoProduccion);
+		gestionarEmpleos(objetivoProduccion);
 //		// 3 decidir los nacimientos en funcion de cuantas defunciones, y otras cosas,
 //		// hayan pasado en el periodo anterior
 //		gestionarNacimientos();
+		gestionarNacimientos();
 	}
 
 	////////////////////////////////////////////////////
@@ -127,6 +129,28 @@ public class Estado {
 				}
 			}
 		}
+	}
+	
+	private void gestionarNacimientos() {
+		
+	}
+	
+	private void gestionarEmpleos(double objetivoProduccion) {
+		double cantidadNecesitadaTrabajadores= objetivoProduccion / cantidadProducidaPorTrabajador;
+//		Contratar a parados en caso de que se falte trabajadores
+		while (trabajadores.getMiembros().size() < cantidadNecesitadaTrabajadores && !parados.getMiembros().isEmpty()) {
+			Adulto contratado = parados.getFirst();
+			trabajadores.getMiembros().add(contratado);
+		}
+//		Despedir a trabajadores en caso de que sobra trabajadores
+		while (trabajadores.getMiembros().size() > cantidadNecesitadaTrabajadores) {
+			Adulto despedido = trabajadores.getFirst();
+			parados.getMiembros().add(despedido);
+		}
+	}
+	
+	private double calcularCantidadAProducir(double porcentajeIncrementoDemanda) {
+		return totalDemandado *= 1 + porcentajeIncrementoDemanda;
 	}
 
 	private boolean isAnciano(Adulto adulto) {
