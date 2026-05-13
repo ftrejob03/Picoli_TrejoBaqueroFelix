@@ -27,6 +27,9 @@ public class Estado {
 
 	// prduccion
 	private double totalDemandado = 0;
+	
+	// Nº fallecidos del último período
+	private int fallecidosUltimoPeriodo;
 
 	public Estado() {
 		super();
@@ -47,7 +50,15 @@ public class Estado {
 //		// 3 decidir los nacimientos en funcion de cuantas defunciones, y otras cosas,
 //		// hayan pasado en el periodo anterior
 //		gestionarNacimientos();
-		gestionarNacimientos();
+		double nacimientosTeoricos = fallecidosUltimoPeriodo * (1 + porcentajeIncrementoDemanda);
+		if (capital < 0) {
+			double ratioDeficit = Math.abs(capital) / totalDemandado;
+			nacimientosTeoricos *= (1 - ratioDeficit);
+		}
+		int totalNacimientos = (int) nacimientosTeoricos;
+		gestionarNacimientos(totalNacimientos);
+		// reiniciar el contador de fallecidosUltimoPeriodo para no incrementar de manera loca los nacimientos en los próximos períodos
+		fallecidosUltimoPeriodo = 0;
 	}
 
 	////////////////////////////////////////////////////
@@ -110,6 +121,7 @@ public class Estado {
 				Ser ser = iterator.next();
 				if (!ser.isVivo()) {
 					iterator.remove();
+					fallecidosUltimoPeriodo += 1;
 				}
 			}
 		}
@@ -131,8 +143,13 @@ public class Estado {
 		}
 	}
 	
-	private void gestionarNacimientos() {
-		
+	private void gestionarNacimientos(int cantidad) {
+		for (int i = 0; i < cantidad; i++) {
+			double esperanza = 100.0;
+			double necesidadVital = TipoPago.menor.getNecesidadVital();
+			Menor nuevoMenor = new Menor(esperanza, necesidadVital);
+			menores.getMiembros().add(nuevoMenor);
+		}
 	}
 	
 	private void gestionarEmpleos(double objetivoProduccion) {
