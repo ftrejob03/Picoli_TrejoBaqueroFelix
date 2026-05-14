@@ -40,20 +40,24 @@ public class Estado {
 	}
 
 	public void abrirPeriodo(double porcentajeIncrementoDemanda) {
+		// Normalizar el parámetro que es un número pasándolo en porcentaje real.
+		double porcentajeNormalizado = porcentajeIncrementoDemanda;
+		if (Math.abs(porcentajeNormalizado) > 1.00)
+			porcentajeNormalizado = porcentajeIncrementoDemanda / 100.00;
 		// 1 calcular la cantidad que debe producir el estado segun el incremento (puede
 //		// ser una cantidad menor)
 //		double objetivoProduccion = calcularCantidadAProducir(porcentajeIncrementoProduccion);
-		double objetivoProduccion = calcularCantidadAProducir(porcentajeIncrementoDemanda);
+		double objetivoProduccion = calcularCantidadAProducir(porcentajeNormalizado);
 //		// 2 Contratar o despedir a adultos segun sea la necesidad
 //		gestionarEmpleos(objetivoProduccion);
 		gestionarEmpleos(objetivoProduccion);
 //		// 3 decidir los nacimientos en funcion de cuantas defunciones, y otras cosas,
 //		// hayan pasado en el periodo anterior
 //		gestionarNacimientos();
-		double nacimientosTeoricos = fallecidosUltimoPeriodo * (1 + porcentajeIncrementoDemanda);
+		double nacimientosTeoricos = fallecidosUltimoPeriodo * (1 + porcentajeNormalizado);
 		if (capital < 0) {
 			double ratioDeficit = Math.abs(capital) / totalDemandado;
-			nacimientosTeoricos *= (1 - ratioDeficit);
+			nacimientosTeoricos *= Math.max(0, 1 - ratioDeficit);
 		}
 		int totalNacimientos = (int) nacimientosTeoricos;
 		gestionarNacimientos(totalNacimientos);
@@ -203,4 +207,15 @@ public class Estado {
 	public void setCapital(double capital) {
 		this.capital = capital;
 	}
+
+	// Get y Set necesario para las pruebas. Creo que el get no hace falta pero lo tengo puesto por si acaso.
+	public int getFallecidosUltimoPeriodo() {
+		return fallecidosUltimoPeriodo;
+	}
+
+	public void setFallecidosUltimoPeriodo(int fallecidosUltimoPeriodo) {
+		this.fallecidosUltimoPeriodo = fallecidosUltimoPeriodo;
+	}
+	
+	
 }
